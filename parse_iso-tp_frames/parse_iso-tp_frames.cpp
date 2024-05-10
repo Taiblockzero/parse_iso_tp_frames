@@ -30,18 +30,11 @@ int hexStringToInt(const std::string& str)
     return res;
 }
 
-// Parses and prints Single frame
-void parseSingleFrame(const std::string& frame)
+// Parses Single frame
+void parseSingleFrame(const std::string& frame, std::string& message)
 {
-    std::string ecuHeader = frame.substr(0, 3);
     int messageLenChars = std::stoi(frame.substr(4, 1)) * 2; //message length in characters = message length in bytes(from 0 to 7) * 2
-    
-    std::cout << ecuHeader << ": ";
-    for (int i = 0; i < messageLenChars; i ++)
-    {
-        std::cout << frame[i + SF_MESSAGE_OFFSET];
-    }
-    std::cout << std::endl;
+    message = frame.substr(SF_MESSAGE_OFFSET, messageLenChars);
 }
 
 // Parses First frame. Returns multiframe message length left to parse after the first frame (in characters, not bytes).
@@ -107,7 +100,8 @@ int parseFramesAndPrintMessages(std::ifstream& transcript)
         switch (frame[FRAME_TYPE_INDEX])
         {
         case '0':
-            parseSingleFrame(frame);
+            parseSingleFrame(frame, message);
+            std::cout << frame.substr(0, 3) << ": " << message << std::endl;
             break;
         case '1':
             messageLenLeft = parseFirstFrame(frame, message);
